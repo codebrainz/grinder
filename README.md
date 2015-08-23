@@ -124,3 +124,17 @@ Windows out of the box. `SignalSource` and `FileSource`, which use file
 descriptors rather than Win32 `HANDLE`s are most likely to require 
 porting effort. Supporting sockets on Windows should be relatively 
 painless as it has a file-descriptor like API on Windows.
+
+Class Hierarchy
+===============
+
+Below is a little diagram to show the class inheritance in Grinder.
+
+    EventLoop
+    EventSource
+        IdleSource
+        TimeoutSource
+        FileSource
+            SignalSource
+            SignalFD
+            TimerFD
