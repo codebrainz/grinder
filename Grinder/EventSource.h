@@ -14,7 +14,6 @@ namespace Grinder
 {
 
 class EventLoop;
-class EventSourceData;
 class EventSource;
 
 typedef std::function<bool(EventSource&)> EventHandler;
