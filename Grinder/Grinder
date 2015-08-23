@@ -14,5 +14,11 @@
 #include <Grinder/TimeoutSource.h>
 #include <Grinder/Utility.h>
 
+#if defined(__linux) || defined(__linux__)
+# define GRINDER_LINUX 1
+# include <Grinder/Linux/SignalFD.h>
+# include <Grinder/Linux/TimerFD.h>
+#endif
+
 #endif // GRINDER_HEADER__
 

@@ -93,10 +93,7 @@ void EventLoop::iteration()
 	if (::poll(impl->poll_fds.data(), impl->poll_fds.size(), max_timeout) > 0)
 	{
 		for (size_t i = 0; i < impl->pollable_sources.size(); i++)
-		{
-			if (impl->poll_fds[i].revents != 0)
-				impl->pollable_sources[i]->revents = impl->poll_fds[i].revents;
-		}
+			impl->pollable_sources[i]->revents = impl->poll_fds[i].revents;
 	}
 
 	// now check if any more sources are ready after polling

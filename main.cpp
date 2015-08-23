@@ -33,5 +33,24 @@ int main()
 		return true;
 	});
 
+#ifdef GRINDER_LINUX
+
+	loop.add_event_source(new TimerFD(250), [&](EventSource&) {
+		cout << "TimerFD expired" << endl;
+		return true;
+	});
+
+	sigset_t ss;
+	::sigemptyset(&ss);
+	::sigaddset(&ss, SIGINT);
+	::sigaddset(&ss, SIGTERM);
+	loop.add_event_source(new SignalFD(&ss), [&](EventSource&) {
+		cout << "Received signal, quitting" << endl;
+		loop.quit();
+		return true;
+	});
+
+#endif
+
 	return loop.run();
 }
