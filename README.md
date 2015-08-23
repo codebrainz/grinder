@@ -23,16 +23,40 @@ out when the events are ready as well as dispatching events. All of
 the `___Source` classes as well as the classes in the `Grinder/Linux`
 directory provide implementations of the `EventSource` interface.
 
-There are 3 basic event source types, represented by the base classes
-`FileSource`, `IdleSource`, and `TimeoutSource`. Most event sources
-will want to subclass one of these rather than subclassing the `EventSource`
-directly.
+The `EventSource` interface is composed of the following pure virtual 
+functions:
 
-The typedef for `EventHandler` provides a function type that should be
-used when setting the callback for event sources. You can use a functor,
-function pointer or anonymous (lambda) function for the event handler.
-If the handler returns `false`, the event source which called the
-handler will be removed from the event loop. If it returns `true`,
+- `bool prepare(int& max_timeout)`
+  This function is called before the event loop polls any file descriptors.
+  If your event source knows it's ready now, implementations can return
+  `true` and skip polling. The `max_timeout` argument is an output
+  parameter that can limit how long the `poll()` timeout is. The value
+  is in milliseconds and may be lowered by other event sources.
+- `bool check()`
+  This function is called after the file descriptors have been polled.
+  The `check()` function won't be called if the `prepare()` function
+  returned `true` for a particular event loop iteration. Examples of
+  using this function are to check if specific `FileEvents` have occured
+  or whether a timer has elapsed. Return `true` to have the event handler
+  dispatched or false to not dispatch.
+- `bool dispatch(EventHandler& handler)`
+  This function is called when either the `prepare()` or `check()`
+  functions have returned `true` indicating that an event has occurred.
+  The `handler` argument provides a reference to the function to be
+  called. Implementations of this function might choose to read a file
+  descriptor or setup some event source-specific state which might be
+  useful to event handlers.
+
+There are 3 basic event source types, represented by the base classes 
+`FileSource`, `IdleSource`, and `TimeoutSource`. Most event sources 
+will want to subclass one of these rather than subclassing the 
+`EventSource` directly.
+
+The typedef for `EventHandler` provides a function type that should be 
+used when setting the callback for event sources. You can use a 
+functor, function pointer or anonymous (lambda) function for the event 
+handler. If the handler returns `false`, the event source which called 
+the handler will be removed from the event loop. If it returns `true`, 
 the event source will continue to be checked and dispatched.
 
 Event Sources
