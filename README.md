@@ -95,8 +95,8 @@ which provides a wrapper around the Linux-specific `signalfd` API. It
 derives from `FileSource` and watches a file descriptor that the kernel
 will send signal information to.
 
-Compiling
-=========
+Building and Embedding
+======================
 
 Currently the library is meant to be integrated into other projects
 directly. There is a `Makefile` included in the root source directory
@@ -110,19 +110,45 @@ just enough to compile the code (into a single demo program) using
 QtCreator/qmake. This is only meant for use when working on `Grinder`
 code in the QtCreator IDE, not for a real build system.
 
+### Using it with your Project
+
+This is the current recommended method of using Grinder in your project:
+
+1. Copy the entire `Grinder` sub-directory into your project's tree.
+2. Copy the `License.txt` and optionally the `README.md` files into
+   that same directory.
+3. If not using the Linux-specific classes, you can delete the
+   `Grinder/Linux` directory.
+4. Add the .cpp files to be compiled by your build system/C++ compiler.
+  - For GCC-like compilers, you should use the `-std=c++11` flag to
+    enable the C++11 support which Grinder requires.
+  - Add the directory containing the `Grinder` directory to the compiler's
+    include search path. This is so your code can use Grinder headers
+    like `#include <Grinder/TheHeader.h>`.
+5. In the code that uses Grinder, it is recommended to include the
+   main `Grinder` header like `#include <Grinder/Grinder>`. That header
+   includes all of the other headers, including platform-specific ones
+   if supported.
+
+It is up to the project whether to build an actual library. With some
+build-systems it's convenient to build "helper" libraries and in other
+cases you might want a proper shared library if several programs you
+control use Grinder. The optimal method for a single application is to
+link the compiled Grinder object files directly into the main binary.
+
 Portability
 ===========
 
-While Grinder is meant to be cross-platform, at least initially such 
-support is not widely tested. Primary development happens on Linux as 
+While Grinder is meant to be cross-platform, at least initially such
+support is not widely tested. Primary development happens on Linux as
 well as minor testing on OSX.
 
-No testing on Windows has been performed but it is a goal to add both 
-generic and platform-specific support for Windows. The `EventLoop`, 
-`EventSource`, `IdleSource`, and `TimeoutSource` should be fine on 
-Windows out of the box. `SignalSource` and `FileSource`, which use file 
-descriptors rather than Win32 `HANDLE`s are most likely to require 
-porting effort. Supporting sockets on Windows should be relatively 
+No testing on Windows has been performed but it is a goal to add both
+generic and platform-specific support for Windows. The `EventLoop`,
+`EventSource`, `IdleSource`, and `TimeoutSource` should be fine on
+Windows out of the box. `SignalSource` and `FileSource`, which use file
+descriptors rather than Win32 `HANDLE`s are most likely to require
+porting effort. Supporting sockets on Windows should be relatively
 painless as it has a file-descriptor like API on Windows.
 
 Class Hierarchy
