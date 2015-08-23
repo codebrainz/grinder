@@ -7,7 +7,8 @@ SOURCES += \
     Grinder/EventLoop.cpp \
     Grinder/TimeoutSource.cpp \
     Grinder/Linux/TimerFD.cpp \
-    Grinder/Linux/SignalFD.cpp
+    Grinder/Linux/SignalFD.cpp \
+    Grinder/SignalSource.cpp
 
 HEADERS += \
     Grinder/EventLoop.h \
@@ -20,5 +21,6 @@ HEADERS += \
     Grinder/Grinder \
     Grinder/Linux/TimerFD.h \
     Grinder/Linux/SignalFD.h \
-    Grinder/Platform.h
+    Grinder/Platform.h \
+    Grinder/SignalSource.h
 

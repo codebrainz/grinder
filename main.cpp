@@ -33,7 +33,18 @@ int main()
 		return true;
 	});
 
-#ifdef GRINDER_LINUX
+	sigset_t ss;
+	::sigemptyset(&ss);
+	::sigaddset(&ss, SIGINT);
+	::sigaddset(&ss, SIGTERM);
+	loop.add_event_source(new SignalSource(&ss), [&](EventSource& source) {
+		auto &sig_source = dynamic_cast<SignalSource&>(source);
+		cout << "Recevied signal '" << sig_source.signo << "', quitting" << endl;
+		loop.quit();
+		return true;
+	});
+
+#if 0
 
 	loop.add_event_source(new TimerFD(250), [&](EventSource&) {
 		cout << "TimerFD expired" << endl;

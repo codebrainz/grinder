@@ -12,6 +12,7 @@
 #include <Grinder/FileSource.h>
 #include <Grinder/IdleSource.h>
 #include <Grinder/Platform.h>
+#include <Grinder/SignalSource.h>
 #include <Grinder/TimeoutSource.h>
 #include <Grinder/Utility.h>
 

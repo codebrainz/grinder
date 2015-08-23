@@ -27,15 +27,15 @@ public:
 	void quit(int exit_code=0);
 
 	template< class T, class... Args >
-	bool emplace_event_source(Args&&... args)
+	T *emplace_event_source(Args&&... args)
 	{
 		auto source = new T(std::forward<Args&&>(args)...);
 		if (! add_event_source(source))
 		{
 			delete source;
-			return false;
+			return nullptr;
 		}
-		return true;
+		return source;
 	}
 
 	bool add_event_source(EventSource *source, EventHandler handler=nullptr);

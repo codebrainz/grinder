@@ -4,6 +4,7 @@ ldflags = $(LDFLAGS)
 
 sources = \
 	Grinder/EventLoop.cpp \
+	Grinder/SignalSource.cpp \
 	Grinder/TimeoutSource.cpp \
 	Grinder/Linux/SignalFD.cpp \
 	Grinder/Linux/TimerFD.cpp
