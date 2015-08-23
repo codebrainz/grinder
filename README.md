@@ -56,11 +56,11 @@ to be called when the event loop is idle.
 
 ### TimeoutSource
 
-Timeout sources show an example of a class which is directly inherited 
-from `EventSource` as they have no backing file descriptor. Timeouts 
-are not particularly accurate but provide a convenient mechanism to 
-call a function at roughly some time in the future. Ususally you won't 
-use `TimeoutSource` class directly but rather add timeout event sources 
+Timeout sources show an example of a class which is directly inherited
+from `EventSource` as they have no backing file descriptor. Timeouts
+are not particularly accurate but provide a convenient mechanism to
+call a function at roughly some time in the future. Ususally you won't
+use `TimeoutSource` class directly but rather add timeout event sources
 to the event loop using `EventLoop::add_timeout()`.
 
 An alternative to `TimeoutSource` for Linux is the `TimerFD` class. It
@@ -84,12 +84,43 @@ and optionally modifies the global process signal mask, adding more
 than one `SignalSource` to event loops will cause bad things to happen.
 
 The recommended usage is to create a single `SignalSource` when setting
-up the `EventLoop` initially, and adding it to the loop, leaving it
-to be freed when the loop cleans up. Keep a pointer the `EventSource`
-if you want to add or remove signals to be watched. Any other usage
-is likely to cause problems.
+up the `EventLoop` initially, and adding it to the loop, leaving it to
+be freed when the loop cleans up. Keep a pointer the `EventSource` if
+you want to add or remove signals to be watched using the
+`SignalSource::add()` and `SignalSource::remove()` member functions.
+Any other usage is likely to cause problems.
 
 An alternative to `SignalSource` for Linux is the `SignalFD` class
 which provides a wrapper around the Linux-specific `signalfd` API. It
 derives from `FileSource` and watches a file descriptor that the kernel
 will send signal information to.
+
+Compiling
+=========
+
+Currently the library is meant to be integrated into other projects
+directly. There is a `Makefile` included in the root source directory
+which is just meant for testing the build. It doesn't support fancy
+stuff like out-of-tree builds or installing the library. The `Makefile`
+produces a `libgrinder.so` file and `GrinderTest` program in the root
+directory.
+
+There's also a `Grinder.pro` file in the root source directory which is
+just enough to compile the code (into a single demo program) using
+QtCreator/qmake. This is only meant for use when working on `Grinder`
+code in the QtCreator IDE, not for a real build system.
+
+Portability
+===========
+
+While Grinder is meant to be cross-platform, at least initially such 
+support is not widely tested. Primary development happens on Linux as 
+well as minor testing on OSX.
+
+No testing on Windows has been performed but it is a goal to add both 
+generic and platform-specific support for Windows. The `EventLoop`, 
+`EventSource`, `IdleSource`, and `TimeoutSource` should be fine on 
+Windows out of the box. `SignalSource` and `FileSource`, which use file 
+descriptors rather than Win32 `HANDLE`s are most likely to require 
+porting effort. Supporting sockets on Windows should be relatively 
+painless as it has a file-descriptor like API on Windows.
