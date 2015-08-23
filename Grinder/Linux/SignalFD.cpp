@@ -6,6 +6,9 @@
 //
 
 #include <Grinder/Linux/SignalFD.h>
+
+#ifdef GRINDER_LINUX
+
 #include <unistd.h>
 #include <sys/signalfd.h>
 
@@ -75,3 +78,5 @@ void SignalFD::update_signals()
 }
 
 } // namespace Grinder
+
+#endif // GRINDER_LINUX

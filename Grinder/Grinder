@@ -11,11 +11,11 @@
 #include <Grinder/FileEvents.h>
 #include <Grinder/FileSource.h>
 #include <Grinder/IdleSource.h>
+#include <Grinder/Platform.h>
 #include <Grinder/TimeoutSource.h>
 #include <Grinder/Utility.h>
 
-#if defined(__linux) || defined(__linux__)
-# define GRINDER_LINUX 1
+#ifdef GRINDER_LINUX
 # include <Grinder/Linux/SignalFD.h>
 # include <Grinder/Linux/TimerFD.h>
 #endif

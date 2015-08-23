@@ -8,6 +8,9 @@
 #ifndef GRINDER_LINUX_SIGNALFD_H
 #define GRINDER_LINUX_SIGNALFD_H
 
+#include <Grinder/Platform.h>
+#ifdef GRINDER_LINUX
+
 #include <Grinder/FileSource.h>
 #include <signal.h>
 
@@ -35,5 +38,7 @@ private:
 };
 
 } // namespace Grinder
+
+#endif // GRINDER_LINUX
 
 #endif // GRINDER_LINUX_SIGNALFD_H

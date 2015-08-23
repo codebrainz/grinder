@@ -19,5 +19,6 @@ HEADERS += \
     Grinder/Utility.h \
     Grinder/Grinder \
     Grinder/Linux/TimerFD.h \
-    Grinder/Linux/SignalFD.h
+    Grinder/Linux/SignalFD.h \
+    Grinder/Platform.h
 

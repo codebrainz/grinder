@@ -6,6 +6,9 @@
 //
 
 #include <Grinder/Linux/TimerFD.h>
+
+#ifdef GRINDER_LINUX
+
 #include <cstdint>
 #include <iostream>
 #include <unistd.h>
@@ -72,3 +75,5 @@ bool TimerFD::dispatch(EventHandler &func)
 }
 
 } // namespace Grinder
+
+#endif // GRINDER_LINUX

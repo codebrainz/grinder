@@ -8,6 +8,9 @@
 #ifndef GRINDER_LINUX_TIMERFD_H
 #define GRINDER_LINUX_TIMERFD_H
 
+#include <Grinder/Platform.h>
+#ifdef GRINDER_LINUX
+
 #include <Grinder/FileSource.h>
 
 namespace Grinder
@@ -45,5 +48,7 @@ private:
 };
 
 } // namespace Grinder
+
+#endif // GRINDER_LINUX
 
 #endif // GRINDER_LINUX_TIMERFD_H
