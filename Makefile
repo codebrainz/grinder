@@ -8,24 +8,34 @@ sources = \
 	Grinder/Linux/SignalFD.cpp \
 	Grinder/Linux/TimerFD.cpp
 
-objects = $(sources:.o=.cpp)
+objects = $(sources:.cpp=.o)
+
+ifeq ($(V),1)
+	VCXX   = $(CXX) -c
+	VCXXLD = $(CXX)
+	VDEPS  = $(CXX) -MM
+else
+	VCXX   = @echo "  COMPILE $@" && $(CXX) -c
+	VCXXLD = @echo "  LINK $@" && $(CXX)
+	VDEPS  = @echo "  DEPENDS $@" && $(CXX) -MM
+endif
 
 all: GrinderTest
 
 GrinderTest: libgrinder.so main.cpp
-	$(CXX) $(strip $(cxxflags) -o $@ main.cpp $(ldflags) -L. -lgrinder)
+	$(VCXXLD) $(strip $(cxxflags) -o $@ main.cpp $(ldflags) -L. -lgrinder)
 
 libgrinder.so: $(objects)
-	$(CXX) $(strip -shared $(cxxflags) -o $@ $(objects) $(ldflags))
+	$(VCXXLD) $(strip -shared $(cxxflags) -o $@ $(objects) $(ldflags))
 
 .cpp.o:
-	$(CXX) $(strip $(cxxflags) -o $@ $<)
+	$(VCXX) $(strip $(cxxflags) -o $@ $<)
 
 -include Makefile.deps
 Makefile.deps: $(sources) main.cpp
-	$(CXX) $(strip -MM $(cxxflags) $(sources) main.cpp > $@)
+	$(VDEPS) $(strip $(cxxflags) $(sources) main.cpp > $@)
 
 clean:
-	$(RM) *.o Grinder/*.o *.so GrinderTest
+	$(RM) *.o Grinder/*.o Grinder/Linux/*.o *.so GrinderTest
 
 .PHONY: all clean
