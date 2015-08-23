@@ -1,0 +1,18 @@
+//
+// Copyright (c) 2015 Matthew Brush <mbrush@codebrainz.ca>
+// All rights reserved.
+//
+
+#ifndef GRINDER_HEADER__
+#define GRINDER_HEADER__
+
+#include <Grinder/EventLoop.h>
+#include <Grinder/EventSource.h>
+#include <Grinder/FileEvents.h>
+#include <Grinder/FileSource.h>
+#include <Grinder/IdleSource.h>
+#include <Grinder/TimeoutSource.h>
+#include <Grinder/Utility.h>
+
+#endif // GRINDER_HEADER__
+

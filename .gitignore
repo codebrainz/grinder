@@ -1,0 +1,6 @@
+*.[ao]
+*.so
+*.pro.user
+/GrinderTest
+/libgrinder.so
+/Makefile.deps
