@@ -45,7 +45,10 @@ functions:
   The `handler` argument provides a reference to the function to be
   called. Implementations of this function might choose to read a file
   descriptor or setup some event source-specific state which might be
-  useful to event handlers.
+  useful to event handlers. When this function returns `false`, the
+  event source dispatching will be removed from the event loop and
+  deleted. If it returns `true`, events will continue to be checked and
+  dispatched.
 
 There are 3 basic event source types, represented by the base classes 
 `FileSource`, `IdleSource`, and `TimeoutSource`. Most event sources 
