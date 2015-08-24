@@ -98,12 +98,7 @@ designed to handle timers accurate to whole milliseconds.
 ### SignalSource
 
 Signal sources are designed to wrangle Unix signals into the event
-loop. They install a global signal handler which writes to one end of
-a pipe, while the `SignalSource`, being derived from `FileSource`,
-watches the other end of the pipe in the event loop. The signal handler
-writes the signal number as a 32-bit unsigned integer and the `SignalSource`
-reads the signal number, sets its `SignalSource::signo` member variable
-and then dispatches the event to the handler.
+loop.
 
 It's important that only one `SignalSource` instance be added to an
 event loop. Since the `SignalSource` installs global signal handlers,
@@ -117,10 +112,21 @@ you want to add or remove signals to be watched using the
 `SignalSource::add()` and `SignalSource::remove()` member functions.
 Any other usage is likely to cause problems.
 
-An alternative to `SignalSource` for Linux is the `SignalFD` class
-which provides a wrapper around the Linux-specific `signalfd` API. It
-derives from `FileSource` and watches a file descriptor that the kernel
-will send signal information to.
+There are two concrete implementations of the `SignalSource`,
+`GenericSignalSource` and the Linux-specific `SignalFD`.
+
+`GenericSignalSource` installs a global signal handler which writes to 
+one end of a pipe, while the event source, being derived from 
+`FileSource` (via `SignalSource`), watches the other end of the pipe in 
+the event loop. The signal handler writes the signal number as a 32-bit 
+unsigned integer and the `GenericSignalSource` reads the signal number, 
+sets the `SignalSource::signo` member variable and then dispatches the 
+event to the handler.
+
+An alternative to `GenericSignalSource` for Linux is the `SignalFD` 
+class which provides a wrapper around the Linux-specific `signalfd` 
+API. It derives from `FileSource` (via `SignalSource`) and watches a 
+file descriptor that the kernel will send signal information to.
 
 Building and Embedding
 ======================
@@ -189,5 +195,6 @@ Below is a little diagram to show the class inheritance in Grinder.
         TimeoutSource
         FileSource
             SignalSource
-            SignalFD
+              GenericSignalSource
+              SignalFD
             TimerFD

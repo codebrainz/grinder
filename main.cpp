@@ -33,13 +33,11 @@ int main()
 		return true;
 	});
 
-	sigset_t ss;
-	::sigemptyset(&ss);
-	::sigaddset(&ss, SIGINT);
-	::sigaddset(&ss, SIGTERM);
-	loop.add_event_source(new SignalSource(&ss), [&](EventSource& source) {
-		auto &sig_source = dynamic_cast<SignalSource&>(source);
-		cout << "Recevied signal '" << sig_source.signo << "', quitting" << endl;
+	auto sig_source = new GenericSignalSource(true);
+	sig_source->add(SIGINT);
+	sig_source->add(SIGTERM);
+	loop.add_event_source(sig_source, [&](EventSource&) {
+		cout << "Recevied signal '" << sig_source->signo << "', quitting" << endl;
 		loop.quit();
 		return true;
 	});

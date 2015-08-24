@@ -1,105 +1,67 @@
 #include <Grinder/SignalSource.h>
-#include <Grinder/FileSource.h>
-#include <cstdint>
-#include <cstdio>
-#include <cstring>
-#include <iostream>
+#include <Grinder/Platform.h>
+#ifdef GRINDER_LINUX
+# include <Grinder/Linux/SignalFD.h>
+#else
+# include <Grinder/GenericSignalSource.h>
+#endif
 #include <unistd.h>
-
-using namespace std;
 
 namespace Grinder
 {
 
-static const int PIPE_READ = 0;
-static const int PIPE_WRITE = 1;
-static int pipe_fds[2] = { -1, -1 };
-
-static void signal_handler(int signo)
+SignalSource::SignalSource(bool manage_proc_mask)
+	: FileSource(-1, FileEvents::INPUT),
+	  m_manage_proc_mask(manage_proc_mask)
 {
-	uint32_t usigno = signo;
-	::write(pipe_fds[PIPE_WRITE], &usigno, sizeof(uint32_t));
+	sigemptyset(&m_sigs);
+	if (m_manage_proc_mask)
+		sigprocmask(SIG_BLOCK, nullptr, &m_old_sigs);
 }
 
-SignalSource::SignalSource(const sigset_t *sigs, bool block_sigs)
+SignalSource::SignalSource(const sigset_t *sigs, bool manage_proc_mask)
 	: FileSource(-1, FileEvents::INPUT),
-	  signo(0),
-	  m_block_sigs(block_sigs)
+	  m_manage_proc_mask(manage_proc_mask)
 {
-	if (m_block_sigs)
-		::sigprocmask(SIG_BLOCK, nullptr, &m_old_sigs);
-
 	if (sigs)
-		signals = *sigs;
+		m_sigs = *sigs;
 	else
-		::sigemptyset(&signals);
-
-	if (pipe_fds[0] == -1 && pipe_fds[1] == -1)
-	{
-		if (::pipe(pipe_fds) == 0)
-			fd = pipe_fds[PIPE_READ];
-	}
-
-	update_signals();
+		sigemptyset(&m_sigs);
+	if (m_manage_proc_mask)
+		sigprocmask(SIG_BLOCK, nullptr, &m_old_sigs);
 }
 
 SignalSource::~SignalSource()
 {
-	::close(pipe_fds[0]);
-	::close(pipe_fds[1]);
-	pipe_fds[0] = pipe_fds[1] = -1;
-
-	if (m_block_sigs)
+	try
 	{
-		sigset_t fullset;
-		::sigfillset(&fullset);
-		::sigprocmask(SIG_UNBLOCK, &fullset, nullptr);
-		::sigprocmask(SIG_BLOCK, &m_old_sigs, nullptr);
+		if (m_manage_proc_mask)
+		{
+			sigset_t ss;
+			sigfillset(&ss);
+			sigprocmask(SIG_UNBLOCK, &ss, nullptr);
+			sigprocmask(SIG_BLOCK, &m_old_sigs, nullptr);
+		}
+		close(fd);
 	}
+	catch (...) { /* pass */ }
 }
 
 void SignalSource::add(int signo)
 {
-	::sigaddset(&signals, signo);
-	update_signals();
+	sigaddset(&m_sigs, signo);
+	update();
 }
 
 void SignalSource::remove(int signo)
 {
-	::sigdelset(&signals, signo);
-	update_signals();
+	sigdelset(&m_sigs, signo);
+	update();
 }
 
-bool SignalSource::check()
+void SignalSource::update()
 {
-	return (revents & FileEvents::INPUT);
-}
-
-bool SignalSource::dispatch(EventHandler &func)
-{
-	uint32_t sig = 0;
-	if (::read(fd, &sig, sizeof(uint32_t)) == sizeof(uint32_t))
-	{
-		signo = sig;
-		return FileSource::dispatch(func);
-	}
-	return true;
-}
-
-void SignalSource::update_signals()
-{
-	// fixme: how to iterate a sigset?
-	for (int i=0; i < 128 /* FIXME: ugh */; i++)
-	{
-		int res = ::sigismember(&signals, i);
-		if (res > 0)
-			::signal(i, signal_handler);
-		else if (res == 0)
-			::signal(i, SIG_DFL);
-	}
-
-	if (m_block_sigs)
-		::sigprocmask(SIG_UNBLOCK, &signals, nullptr);
+	update_signals(&m_sigs, m_manage_proc_mask);
 }
 
 } // namespace Grinder
